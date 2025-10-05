@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:eden_ai/l10n/app_localizations.dart';
 
 import '../../../core/providers/app_providers.dart';
 import '../../../core/utils/user_display_name.dart';

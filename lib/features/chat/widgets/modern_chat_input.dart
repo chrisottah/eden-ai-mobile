@@ -21,7 +21,7 @@ import '../../../core/services/settings_service.dart';
 import '../../chat/services/voice_input_service.dart';
 
 import '../../../shared/utils/platform_utils.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:eden_ai/l10n/app_localizations.dart';
 import '../../../shared/widgets/modal_safe_area.dart';
 
 class _SendMessageIntent extends Intent {

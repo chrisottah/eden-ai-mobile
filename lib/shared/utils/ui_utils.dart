@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:io' show Platform;
 import '../theme/theme_extensions.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:eden_ai/l10n/app_localizations.dart';
 
 /// Utility functions for common UI patterns and helpers
 /// Following Conduit design principles

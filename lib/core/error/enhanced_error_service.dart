@@ -5,7 +5,7 @@ import 'api_error.dart';
 import 'api_error_handler.dart';
 import 'api_error_interceptor.dart';
 import '../../shared/theme/theme_extensions.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:eden_ai/l10n/app_localizations.dart';
 import '../utils/debug_logger.dart';
 
 /// Enhanced error service with comprehensive error handling capabilities

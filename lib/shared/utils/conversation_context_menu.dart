@@ -1,18 +1,18 @@
 import 'dart:io' show Platform;
 
-import 'package:conduit/core/providers/app_providers.dart';
-import 'package:conduit/l10n/app_localizations.dart';
-import 'package:conduit/shared/theme/theme_extensions.dart';
-import 'package:conduit/shared/widgets/conduit_components.dart';
-import 'package:conduit/shared/widgets/modal_safe_area.dart';
-import 'package:conduit/shared/widgets/sheet_handle.dart';
-import 'package:conduit/shared/widgets/themed_dialogs.dart';
+import 'package:eden_ai/core/providers/app_providers.dart';
+import 'package:eden_ai/l10n/app_localizations.dart';
+import 'package:eden_ai/shared/theme/theme_extensions.dart';
+import 'package:eden_ai/shared/widgets/conduit_components.dart';
+import 'package:eden_ai/shared/widgets/modal_safe_area.dart';
+import 'package:eden_ai/shared/widgets/sheet_handle.dart';
+import 'package:eden_ai/shared/widgets/themed_dialogs.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:conduit/features/chat/providers/chat_providers.dart' as chat;
+import 'package:eden_ai/features/chat/providers/chat_providers.dart' as chat;
 
 class ConduitContextMenuAction {
   final IconData cupertinoIcon;

@@ -1,7 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import 'package:conduit/core/models/prompt.dart';
-import 'package:conduit/core/services/prompts_service.dart';
+import 'package:eden_ai/core/models/prompt.dart';
+import 'package:eden_ai/core/services/prompts_service.dart';
 
 part 'prompts_providers.g.dart';
 

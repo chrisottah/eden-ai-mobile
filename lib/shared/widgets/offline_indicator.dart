@@ -9,7 +9,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../core/services/connectivity_service.dart';
 import '../../core/providers/app_providers.dart';
 import '../theme/theme_extensions.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:eden_ai/l10n/app_localizations.dart';
 
 part 'offline_indicator.g.dart';
 

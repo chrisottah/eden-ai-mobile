@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/theme/theme_extensions.dart';
 import '../error/enhanced_error_service.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:eden_ai/l10n/app_localizations.dart';
 
 /// Error boundary widget that catches and handles errors in child widgets
 class ErrorBoundary extends ConsumerStatefulWidget {

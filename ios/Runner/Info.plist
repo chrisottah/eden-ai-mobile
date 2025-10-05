@@ -11,16 +11,19 @@
 			<string>fr</string>
 			<string>it</string>
 		</array>
+		<!-- App name shown under the icon -->
 		<key>CFBundleDisplayName</key>
-		<string>Conduit</string>
+	<string>Eden AI</string>
 		<key>CFBundleExecutable</key>
 		<string>$(EXECUTABLE_NAME)</string>
+		<!-- Your unique bundle identifier -->
 		<key>CFBundleIdentifier</key>
-		<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+		<string>io.edenhub.app</string>
 		<key>CFBundleInfoDictionaryVersion</key>
 		<string>6.0</string>
+		<!-- Internal app name -->
 		<key>CFBundleName</key>
-		<string>conduit</string>
+	<string>Eden AI</string>
 		<key>CFBundlePackageType</key>
 		<string>APPL</string>
 		<key>CFBundleShortVersionString</key>
@@ -58,31 +61,32 @@
 			<key>NSAllowsLocalNetworking</key>
 			<true/>
 		</dict>
-		<!-- Permissions -->
+		<!-- Permissions (all rebranded to Eden AI) -->
 		<key>NSMicrophoneUsageDescription</key>
-		<string>Conduit uses the microphone to record voice messages and enable voice-to-text in chats. For example, when you hold the mic button in a conversation, we capture your speech to send as an audio message or transcript.</string>
+		<string>Eden AI uses the microphone to record voice messages and enable voice-to-text in chats.</string>
 		<key>NSSpeechRecognitionUsageDescription</key>
-		<string>Conduit uses on-device speech recognition so you can dictate messages hands‑free. Your speech is converted to text on your device when available.</string>
+		<string>Eden AI uses on-device speech recognition so you can dictate messages hands-free.</string>
 		<key>NSCameraUsageDescription</key>
-		<string>Conduit uses the camera to take photos or videos you choose to share in chats. For example, you can snap a photo of a document and attach it to a message.</string>
+		<string>Eden AI uses the camera to take photos or videos you choose to share in chats.</string>
 		<key>NSPhotoLibraryUsageDescription</key>
-		<string>Conduit needs access to your photo library so you can select existing images or videos to share in chats. For example, you can pick a screenshot to include in a conversation.</string>
+		<string>Eden AI needs access to your photo library so you can select images or videos to share in chats.</string>
 		<key>CADisableMinimumFrameDurationOnPhone</key>
 		<true/>
 		<key>UIApplicationSupportsIndirectInputEvents</key>
 		<true/>
 		<key>UIStatusBarHidden</key>
 		<false/>
+		<!-- Custom URL scheme for sharing / deep linking -->
 		<key>CFBundleURLTypes</key>
 		<array>
 			<dict>
 				<key>CFBundleTypeRole</key>
 				<string>Editor</string>
 				<key>CFBundleURLName</key>
-				<string>app.cogwheel.conduit.share</string>
+				<string>io.edenhub.app.share</string>
 				<key>CFBundleURLSchemes</key>
 				<array>
-					<string>ShareMedia-app.cogwheel.conduit</string>
+					<string>ShareMedia-io.edenhub.app</string>
 				</array>
 			</dict>
 		</array>

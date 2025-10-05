@@ -4,7 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'skeleton_loader.dart';
 import '../theme/theme_extensions.dart';
 import 'conduit_components.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:eden_ai/l10n/app_localizations.dart';
 
 /// Improved loading state widget with accessibility and better hierarchy
 class ImprovedLoadingState extends StatefulWidget {

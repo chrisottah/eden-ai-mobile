@@ -1,5 +1,5 @@
-name: conduit
-description: Open-source mobile client for Open-WebUI
+name: eden_ai
+description: native mobile application for eden ai
 version: 1.1.6+20
 publish_to: 'none'
 
@@ -80,6 +80,7 @@ dev_dependencies:
   riverpod_generator: ^3.0.0
   riverpod_lint: ^3.0.0
   custom_lint: ^0.8.0
+  rename: ^3.0.1
 
 dependency_overrides:
 
@@ -92,6 +93,7 @@ flutter:
   assets:
     - assets/icons/
     - assets/mermaid.min.js
+    - assets/images/
 
 flutter_native_splash:
   # Splash background matches the light theme; `color_dark` handles dark mode.

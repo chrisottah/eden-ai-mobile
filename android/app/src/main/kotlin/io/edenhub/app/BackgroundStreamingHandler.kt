@@ -1,4 +1,4 @@
-package app.cogwheel.conduit
+package io.edenhub.app
 
 import android.app.*
 import android.content.Context
@@ -18,22 +18,26 @@ import kotlinx.coroutines.*
 import org.json.JSONArray
 import org.json.JSONObject
 
+// ---------------------
+// SERVICE CLASS
+// ---------------------
 class BackgroundStreamingService : Service() {
     private var wakeLock: PowerManager.WakeLock? = null
     private val activeStreams = mutableSetOf<String>()
-    
+
     companion object {
-        const val CHANNEL_ID = "conduit_streaming_channel"
+        const val CHANNEL_ID = "eden_streaming_channel"
         const val NOTIFICATION_ID = 1001
         const val ACTION_START = "START_STREAMING"
         const val ACTION_STOP = "STOP_STREAMING"
+        const val ACTION_KEEP_ALIVE = "KEEP_ALIVE"
     }
-    
+
     override fun onCreate() {
         super.onCreate()
         println("BackgroundStreamingService: Service created")
     }
-    
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_START -> {
@@ -42,32 +46,27 @@ class BackgroundStreamingService : Service() {
                 startForegroundWithNotification(streamCount)
                 println("BackgroundStreamingService: Started foreground service for $streamCount streams")
             }
-            ACTION_STOP -> {
-                stopStreaming()
-            }
-            "KEEP_ALIVE" -> {
+            ACTION_STOP -> stopStreaming()
+            ACTION_KEEP_ALIVE -> {
                 val streamCount = intent.getIntExtra("streamCount", 1)
                 keepAlive()
                 updateNotification(streamCount)
             }
         }
-        
-        return START_STICKY // Restart if killed by system
+        return START_STICKY
     }
-    
+
     private fun startForegroundWithNotification(streamCount: Int) {
         val notification = createNotification(streamCount)
         startForeground(NOTIFICATION_ID, notification)
     }
-    
+
     private fun createNotification(streamCount: Int): Notification {
-        val title = if (streamCount == 1) {
-            "Chat streaming in progress"
-        } else {
+        val title = if (streamCount == 1)
+            "Eden AI streaming in progress"
+        else
             "$streamCount chats streaming"
-        }
-        
-        // Create intent to return to app
+
         val intent = packageManager.getLaunchIntentForPackage(packageName)
         val pendingIntent = PendingIntent.getActivity(
             this,
@@ -75,7 +74,7 @@ class BackgroundStreamingService : Service() {
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        
+
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(title)
             .setContentText("Processing chat responses...")
@@ -89,48 +88,40 @@ class BackgroundStreamingService : Service() {
             .setAutoCancel(false)
             .build()
     }
-    
+
     private fun updateNotification(streamCount: Int) {
-        val notification = createNotification(streamCount)
-        val notificationManager = NotificationManagerCompat.from(this)
-        
         try {
-            notificationManager.notify(NOTIFICATION_ID, notification)
+            NotificationManagerCompat.from(this)
+                .notify(NOTIFICATION_ID, createNotification(streamCount))
         } catch (e: SecurityException) {
             println("BackgroundStreamingService: Notification permission not granted")
         }
     }
-    
+
     private fun acquireWakeLock() {
         if (wakeLock?.isHeld == true) return
-        
-        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
-        wakeLock = powerManager.newWakeLock(
+        val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+        wakeLock = pm.newWakeLock(
             PowerManager.PARTIAL_WAKE_LOCK,
-            "Conduit::StreamingWakeLock"
+            "EdenAI::StreamingWakeLock"
         ).apply {
-            acquire(15 * 60 * 1000L) // 15 minutes max
+            acquire(15 * 60 * 1000L)
         }
         println("BackgroundStreamingService: Wake lock acquired")
     }
-    
+
     private fun releaseWakeLock() {
-        wakeLock?.let {
-            if (it.isHeld) {
-                it.release()
-                println("BackgroundStreamingService: Wake lock released")
-            }
-        }
+        wakeLock?.takeIf { it.isHeld }?.release()
         wakeLock = null
+        println("BackgroundStreamingService: Wake lock released")
     }
-    
+
     private fun keepAlive() {
-        // Refresh wake lock to extend background processing time
         releaseWakeLock()
         acquireWakeLock()
         println("BackgroundStreamingService: Keep alive - wake lock refreshed")
     }
-    
+
     private fun stopStreaming() {
         activeStreams.clear()
         releaseWakeLock()
@@ -138,28 +129,31 @@ class BackgroundStreamingService : Service() {
         stopSelf()
         println("BackgroundStreamingService: Service stopped")
     }
-    
+
     override fun onDestroy() {
         releaseWakeLock()
         super.onDestroy()
         println("BackgroundStreamingService: Service destroyed")
     }
-    
+
     override fun onBind(intent: Intent?): IBinder? = null
 }
 
+// ---------------------
+// HANDLER CLASS
+// ---------------------
 class BackgroundStreamingHandler(private val activity: MainActivity) : MethodCallHandler {
     private lateinit var channel: MethodChannel
     private lateinit var context: Context
     private lateinit var sharedPrefs: SharedPreferences
-    
+
     private val activeStreams = mutableSetOf<String>()
     private var backgroundJob: Job? = null
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-    
+
     companion object {
-        private const val CHANNEL_NAME = "conduit/background_streaming"
-        private const val PREFS_NAME = "conduit_stream_states"
+        private const val CHANNEL_NAME = "eden/background_streaming"
+        private const val PREFS_NAME = "eden_stream_states"
         private const val STREAM_STATES_KEY = "active_streams"
     }
 
@@ -168,7 +162,6 @@ class BackgroundStreamingHandler(private val activity: MainActivity) : MethodCal
         channel.setMethodCallHandler(this)
         context = activity.applicationContext
         sharedPrefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        
         createNotificationChannel()
     }
 
@@ -179,50 +172,36 @@ class BackgroundStreamingHandler(private val activity: MainActivity) : MethodCal
                 if (streamIds != null) {
                     startBackgroundExecution(streamIds)
                     result.success(null)
-                } else {
-                    result.error("INVALID_ARGS", "Stream IDs required", null)
-                }
+                } else result.error("INVALID_ARGS", "Stream IDs required", null)
             }
-            
+
             "stopBackgroundExecution" -> {
                 val streamIds = call.argument<List<String>>("streamIds")
                 if (streamIds != null) {
                     stopBackgroundExecution(streamIds)
                     result.success(null)
-                } else {
-                    result.error("INVALID_ARGS", "Stream IDs required", null)
-                }
+                } else result.error("INVALID_ARGS", "Stream IDs required", null)
             }
-            
+
             "keepAlive" -> {
                 keepAlive()
                 result.success(null)
             }
-            
+
             "saveStreamStates" -> {
                 val states = call.argument<List<Map<String, Any>>>("states")
-                val reason = call.argument<String>("reason")
-                if (states != null) {
-                    saveStreamStates(states, reason ?: "unknown")
-                    result.success(null)
-                } else {
-                    result.error("INVALID_ARGS", "States required", null)
-                }
+                val reason = call.argument<String>("reason") ?: "unknown"
+                if (states != null) saveStreamStates(states, reason)
+                result.success(null)
             }
-            
-            "recoverStreamStates" -> {
-                result.success(recoverStreamStates())
-            }
-            
-            else -> {
-                result.notImplemented()
-            }
+
+            "recoverStreamStates" -> result.success(recoverStreamStates())
+            else -> result.notImplemented()
         }
     }
 
     private fun startBackgroundExecution(streamIds: List<String>) {
         activeStreams.addAll(streamIds)
-        
         if (activeStreams.isNotEmpty()) {
             startForegroundService()
             startBackgroundMonitoring()
@@ -231,7 +210,6 @@ class BackgroundStreamingHandler(private val activity: MainActivity) : MethodCal
 
     private fun stopBackgroundExecution(streamIds: List<String>) {
         activeStreams.removeAll(streamIds.toSet())
-        
         if (activeStreams.isEmpty()) {
             stopForegroundService()
             stopBackgroundMonitoring()
@@ -240,49 +218,29 @@ class BackgroundStreamingHandler(private val activity: MainActivity) : MethodCal
 
     private fun startForegroundService() {
         val serviceIntent = Intent(context, BackgroundStreamingService::class.java)
-        serviceIntent.putExtra("streamCount", activeStreams.size)
-        serviceIntent.action = BackgroundStreamingService.ACTION_START
-        
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            .apply {
+                putExtra("streamCount", activeStreams.size)
+                action = BackgroundStreamingService.ACTION_START
+            }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             context.startForegroundService(serviceIntent)
-        } else {
+        else
             context.startService(serviceIntent)
-        }
     }
 
     private fun stopForegroundService() {
-        val serviceIntent = Intent(context, BackgroundStreamingService::class.java)
-        serviceIntent.action = BackgroundStreamingService.ACTION_STOP
-        context.startService(serviceIntent)
+        val intent = Intent(context, BackgroundStreamingService::class.java)
+            .apply { action = BackgroundStreamingService.ACTION_STOP }
+        context.startService(intent)
     }
 
     private fun startBackgroundMonitoring() {
         backgroundJob?.cancel()
         backgroundJob = scope.launch {
             while (activeStreams.isNotEmpty()) {
-                delay(30000) // Check every 30 seconds
-                
-                // Notify Dart side to check stream health
-                channel.invokeMethod("checkStreams", null, object : MethodChannel.Result {
-                    override fun success(result: Any?) {
-                        when (result) {
-                            is Int -> {
-                                if (result == 0) {
-                                    activeStreams.clear()
-                                    stopForegroundService()
-                                }
-                            }
-                        }
-                    }
-                    
-                    override fun error(errorCode: String, errorMessage: String?, errorDetails: Any?) {
-                        println("BackgroundStreamingHandler: Error checking streams: $errorMessage")
-                    }
-                    
-                    override fun notImplemented() {
-                        println("BackgroundStreamingHandler: checkStreams method not implemented")
-                    }
-                })
+                delay(30000)
+                channel.invokeMethod("checkStreams", null)
             }
         }
     }
@@ -293,48 +251,49 @@ class BackgroundStreamingHandler(private val activity: MainActivity) : MethodCal
     }
 
     private fun keepAlive() {
-        // Just notify the service to refresh
-        val serviceIntent = Intent(context, BackgroundStreamingService::class.java)
-        serviceIntent.action = "KEEP_ALIVE"
-        serviceIntent.putExtra("streamCount", activeStreams.size)
-        context.startService(serviceIntent)
+        val intent = Intent(context, BackgroundStreamingService::class.java)
+            .apply {
+                action = BackgroundStreamingService.ACTION_KEEP_ALIVE
+                putExtra("streamCount", activeStreams.size)
+            }
+        context.startService(intent)
     }
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "Conduit Streaming"
+            val name = "Eden AI Streaming"
             val descriptionText = "Keeps chat streams active in background"
             val importance = NotificationManager.IMPORTANCE_LOW
-            val channel = NotificationChannel(BackgroundStreamingService.CHANNEL_ID, name, importance).apply {
+            val channel = NotificationChannel(
+                BackgroundStreamingService.CHANNEL_ID,
+                name,
+                importance
+            ).apply {
                 description = descriptionText
                 setShowBadge(false)
                 enableLights(false)
                 enableVibration(false)
                 setSound(null, null)
             }
-            
-            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
+            val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            manager.createNotificationChannel(channel)
         }
     }
 
     private fun saveStreamStates(states: List<Map<String, Any>>, reason: String) {
         try {
-            val jsonArray = JSONArray()
-            for (state in states) {
-                val jsonObject = JSONObject()
-                for ((key, value) in state) {
-                    jsonObject.put(key, value)
+            val jsonArray = JSONArray().apply {
+                for (state in states) {
+                    val obj = JSONObject()
+                    for ((key, value) in state) obj.put(key, value)
+                    put(obj)
                 }
-                jsonArray.put(jsonObject)
             }
-            
             sharedPrefs.edit()
                 .putString(STREAM_STATES_KEY, jsonArray.toString())
                 .putLong("saved_timestamp", System.currentTimeMillis())
                 .putString("saved_reason", reason)
                 .apply()
-                
             println("BackgroundStreamingHandler: Saved ${states.size} stream states (reason: $reason)")
         } catch (e: Exception) {
             println("BackgroundStreamingHandler: Failed to save stream states: ${e.message}")
@@ -343,40 +302,30 @@ class BackgroundStreamingHandler(private val activity: MainActivity) : MethodCal
 
     private fun recoverStreamStates(): List<Map<String, Any>> {
         return try {
-            val savedStates = sharedPrefs.getString(STREAM_STATES_KEY, null) ?: return emptyList()
+            val saved = sharedPrefs.getString(STREAM_STATES_KEY, null) ?: return emptyList()
             val timestamp = sharedPrefs.getLong("saved_timestamp", 0)
             val reason = sharedPrefs.getString("saved_reason", "unknown")
-            
-            // Check if states are not too old (max 1 hour)
             val age = System.currentTimeMillis() - timestamp
-            if (age > 3600000) { // 1 hour in milliseconds
+
+            if (age > 3600000) {
                 println("BackgroundStreamingHandler: Stream states too old (${age / 1000}s), discarding")
                 sharedPrefs.edit().remove(STREAM_STATES_KEY).apply()
                 return emptyList()
             }
-            
-            val jsonArray = JSONArray(savedStates)
+
+            val jsonArray = JSONArray(saved)
             val result = mutableListOf<Map<String, Any>>()
-            
             for (i in 0 until jsonArray.length()) {
-                val jsonObject = jsonArray.getJSONObject(i)
+                val obj = jsonArray.getJSONObject(i)
                 val map = mutableMapOf<String, Any>()
-                
-                val keys = jsonObject.keys()
-                while (keys.hasNext()) {
-                    val key = keys.next()
-                    val value = jsonObject.get(key)
-                    map[key] = value
+                obj.keys().forEachRemaining { key ->
+                    map[key] = obj.get(key)
                 }
-                
                 result.add(map)
             }
-            
+
             println("BackgroundStreamingHandler: Recovered ${result.size} stream states (reason: $reason, age: ${age / 1000}s)")
-            
-            // Clear saved states after recovery
             sharedPrefs.edit().remove(STREAM_STATES_KEY).apply()
-            
             result
         } catch (e: Exception) {
             println("BackgroundStreamingHandler: Failed to recover stream states: ${e.message}")

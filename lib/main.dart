@@ -18,7 +18,7 @@ import 'core/auth/auth_state_manager.dart';
 import 'core/utils/debug_logger.dart';
 import 'core/utils/system_ui_style.dart';
 
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:eden_ai/l10n/app_localizations.dart';
 import 'core/services/share_receiver_service.dart';
 import 'core/providers/app_startup_providers.dart';
 

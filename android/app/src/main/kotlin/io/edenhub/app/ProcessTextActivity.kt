@@ -1,4 +1,4 @@
-package app.cogwheel.conduit
+package io.edenhub.app
 
 import android.app.Activity
 import android.content.Intent

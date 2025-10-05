@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:conduit/shared/theme/theme_extensions.dart';
-import 'package:conduit/core/services/platform_service.dart';
-import 'package:conduit/core/services/settings_service.dart';
+import 'package:eden_ai/shared/theme/theme_extensions.dart';
+import 'package:eden_ai/core/services/platform_service.dart';
+import 'package:eden_ai/core/services/settings_service.dart';
 
 class ChatActionButton extends ConsumerStatefulWidget {
   final IconData icon;

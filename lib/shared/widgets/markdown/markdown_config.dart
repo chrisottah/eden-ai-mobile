@@ -13,7 +13,7 @@ import 'package:gpt_markdown/custom_widgets/markdown_config.dart'
 import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:eden_ai/l10n/app_localizations.dart';
 
 import '../../theme/theme_extensions.dart';
 import '../../theme/color_tokens.dart';

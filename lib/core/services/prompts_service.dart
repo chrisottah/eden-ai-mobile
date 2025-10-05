@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:conduit/core/error/api_error_handler.dart';
-import 'package:conduit/core/models/prompt.dart';
-import 'package:conduit/core/providers/app_providers.dart';
-import 'package:conduit/core/services/api_service.dart';
+import 'package:eden_ai/core/error/api_error_handler.dart';
+import 'package:eden_ai/core/models/prompt.dart';
+import 'package:eden_ai/core/providers/app_providers.dart';
+import 'package:eden_ai/core/services/api_service.dart';
 
 class PromptsService {
   const PromptsService(this._apiService);

@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
-import 'package:conduit/core/models/tool.dart';
-import 'package:conduit/core/services/api_service.dart';
-import 'package:conduit/core/error/api_error_handler.dart';
-import 'package:conduit/core/providers/app_providers.dart';
+import 'package:eden_ai/core/models/tool.dart';
+import 'package:eden_ai/core/services/api_service.dart';
+import 'package:eden_ai/core/error/api_error_handler.dart';
+import 'package:eden_ai/core/providers/app_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ToolsService {

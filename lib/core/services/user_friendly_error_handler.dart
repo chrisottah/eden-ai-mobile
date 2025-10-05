@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:eden_ai/l10n/app_localizations.dart';
 import '../../shared/theme/theme_extensions.dart';
 import 'navigation_service.dart';
 import '../utils/debug_logger.dart';

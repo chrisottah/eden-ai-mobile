@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:io' show Platform;
 import '../services/brand_service.dart';
 import '../theme/color_tokens.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:eden_ai/l10n/app_localizations.dart';
 
 /// Standard loading indicators following Conduit design patterns
 class ConduitLoading {
